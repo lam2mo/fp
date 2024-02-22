@@ -16,6 +16,11 @@
 #include <math.h>
 
 /*
+ * toggle some of the more detailed output in float dissection
+ */
+const bool print_all_info = false;
+
+/*
  * print raw bitstrings
  */
 void print_bytes (int value, int len)
@@ -112,13 +117,22 @@ void disect_float (int sign, int e, int exp_len, int f, int sig_len)
         double value = sig_val * exp_val * sign_val;
 
         // print everything
-        printf("  %8s:  sign=%d  e=%d  bias=%d  E=%d  2^E=%d",
-                (normal ? "normal" : "denormal"), sign, e, bias, E, twoE_numer);
-        if (twoE_denom > 1) {
-            printf("/%d", twoE_denom);
+        printf("  %8s:  sign=%d  e=%d  bias=%d  E=%d",
+                (normal ? "normal" : "denormal"), sign, e, bias, E);
+        if (print_all_info) {
+            printf("  2^E=%d", twoE_numer);
+            if (twoE_denom > 1) {
+                printf("/%d", twoE_denom);
+            }
         }
-        printf("  f=%d/%d  M=%d/%d  2^E*M=%d/%d  val=%lf\n",
-                f, denom, M, denom, val_numer, val_denom, value);
+        printf("  f=%d/%d", f, denom);
+        if (print_all_info) {
+            printf("  M=%d/%d  2^E*M=%d/%d",
+                    M, denom, val_numer, val_denom);
+        }
+        printf("  bin=%s%c.", (sign == 1 ? "-" : ""), (normal  ? '1' : '0'));
+        print_bytes(f, sig_len);
+        printf("*2^%d  dec=%lf\n", E, value);
     }
 }
 
